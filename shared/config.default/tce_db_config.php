@@ -22,13 +22,29 @@
 
 /**
  * database type (MYSQL, POSTGRESQL, ORACLE)
+ * Defaults to Supabase (hosted PostgreSQL) when TCEXAM_DB_TYPE is unset.
  */
-define('K_DATABASE_TYPE', '');
+define('K_DATABASE_TYPE', (string) getenv('TCEXAM_DB_TYPE') ?: 'POSTGRESQL');
 
 /**
  * database Host name (eg: localhost)
+ * Defaults to the Supabase direct-Postgres endpoint derived from VITE_SUPABASE_URL.
  */
-define('K_DATABASE_HOST', '');
+define('K_DATABASE_HOST', (string) getenv('TCEXAM_DB_HOST') ?: (function () {
+    $url = getenv('VITE_SUPABASE_URL');
+    if ($url === false || $url === '') {
+        return '';
+    }
+
+    $host = parse_url($url, PHP_URL_HOST);
+    if (!is_string($host)) {
+        return '';
+    }
+
+    $prefix = explode('.', $host, 2)[0];
+
+    return 'db.' . $host;
+})());
 
 /**
  * database port (eg: 3306, 5432, 1521)
@@ -37,22 +53,25 @@ define('K_DATABASE_HOST', '');
  * mysqli.default_socket PHP value. For example, in Apache:
  * php_value mysqli.default_socket "/path/to/mysql.sock"
  */
-define('K_DATABASE_PORT', '');
+define('K_DATABASE_PORT', (string) getenv('TCEXAM_DB_PORT') ?: '5432');
 
 /**
  * database name (TCExam)
+ * Supabase exposes the database as "postgres".
  */
-define('K_DATABASE_NAME', '');
+define('K_DATABASE_NAME', (string) getenv('TCEXAM_DB_NAME') ?: 'postgres');
 
 /**
  * database user name
+ * Supabase's direct-Postgres superuser is "postgres".
  */
-define('K_DATABASE_USER_NAME', '');
+define('K_DATABASE_USER_NAME', (string) getenv('TCEXAM_DB_USER') ?: 'postgres');
 
 /**
  * database user password
+ * Supabase direct-Postgres password (set TCEXAM_DB_PASSWORD or SUPABASE_DB_PASSWORD).
  */
-define('K_DATABASE_USER_PASSWORD', '');
+define('K_DATABASE_USER_PASSWORD', (string) (getenv('TCEXAM_DB_PASSWORD') ?: getenv('SUPABASE_DB_PASSWORD') ?: ''));
 
 /**
  * prefix for database tables names
