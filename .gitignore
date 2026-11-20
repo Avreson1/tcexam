@@ -28,3 +28,4 @@ shared/config/
 target
 vendor
 _TMP
+.env
